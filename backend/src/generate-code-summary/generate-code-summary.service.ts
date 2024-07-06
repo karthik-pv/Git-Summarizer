@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, OnModuleInit } from '@nestjs/common';
 import { AiApiHandlerService } from 'src/ai-api-handler/ai-api-handler.service';
 import { repositorySHA } from 'src/database/schemas/repositorySHA.schema';
 import { GitInteractionService } from 'src/git-interaction/git-interaction.service';
@@ -8,7 +8,7 @@ import { subscription } from 'src/database/schemas/subscription.schema';
 import { repositorySHADatabaseService } from 'src/database/services/repositorySHA.service';
 
 @Injectable()
-export class GenerateCodeSummaryService {
+export class GenerateCodeSummaryService implements OnModuleInit {
   constructor(
     private subService: SubscriptionService,
     private gitService: GitInteractionService,
@@ -23,8 +23,6 @@ export class GenerateCodeSummaryService {
     allSubs: subscription[],
   ): Promise<any> {
     for (const repo of repos) {
-      console.log(repo);
-      console.log(SHAMap);
       const repository: repositorySHA = SHAMap.find(
         (entry) => entry.repository === repo,
       );
@@ -45,8 +43,6 @@ export class GenerateCodeSummaryService {
           learnerMailList += ',';
         }
       }
-      console.log(peerDeveloperMailList);
-      console.log(repository);
       if (repository) {
         const repoSHA: string = repository.SHA;
         const retrievedCode = await this.gitService.getUpdatedCodeFromCommit(
@@ -94,7 +90,23 @@ export class GenerateCodeSummaryService {
       await this.subService.getAllSubscription();
     const updatedSHAValues: repositorySHA[] =
       await this.repoDBSHAService.getAllRepositorySHA();
-    await this.subscriptionCore(repos, updatedSHAValues, allSubscriptions);
-    return allSubscriptions;
+    return await this.subscriptionCore(
+      repos,
+      updatedSHAValues,
+      allSubscriptions,
+    );
+  }
+
+  private startInterval() {
+    this.subscriptionCycle(); // Run it immediately once
+    setInterval(
+      () => {
+        this.subscriptionCycle();
+      },
+      5 * 60 * 1000,
+    ); // 10 minutes in milliseconds
+  }
+  onModuleInit() {
+    this.startInterval();
   }
 }
