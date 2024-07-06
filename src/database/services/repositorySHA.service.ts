@@ -15,6 +15,21 @@ export class repositorySHADatabaseService {
     return await createdRepoSHA.save();
   }
 
+  async updateRepositorySHA(repo: repositorySHA): Promise<repositorySHA> {
+    try {
+      const updatedRepo = await this.repoDBAccess.findOneAndUpdate(
+        { repository: repo.repository },
+        { SHA: repo.SHA },
+        { new: true, upsert: true },
+      );
+
+      return updatedRepo;
+    } catch (error) {
+      console.error('Error updating repository SHA:', error);
+      throw new Error('Failed to update repository SHA');
+    }
+  }
+
   async getAllRepositorySHA(): Promise<repositorySHA[]> {
     return await this.repoDBAccess.find().exec();
   }

@@ -22,4 +22,8 @@ export class subscriptionDatabaseService {
   async getUsersForRepository(repo: string): Promise<subscription[]> {
     return this.sub.find({ repository: repo }).exec();
   }
+
+  async getAllSubscriptions(): Promise<subscription[]> {
+    return this.sub.find().exec();
+  }
 }

@@ -124,6 +124,10 @@ export class GitInteractionService {
 
         if (!existingSHA || existingSHA.SHA !== latestSHA) {
           updatedRepoSHAs.push({ repository: sub, SHA: latestSHA });
+          await this.repoSHADatabaseService.updateRepositorySHA({
+            repository: sub,
+            SHA: latestSHA,
+          });
         }
       }
     } catch (error) {
