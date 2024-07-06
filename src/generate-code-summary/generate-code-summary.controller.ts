@@ -9,4 +9,9 @@ export class GenerateCodeSummaryController {
   fullCycle() {
     return this.mainService.fullCycle();
   }
+
+  @Get('subscriptionCycle')
+  subscriptionCycle() {
+    return this.mainService.subscriptionCycle();
+  }
 }

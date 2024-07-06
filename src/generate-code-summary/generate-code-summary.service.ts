@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { AiApiHandlerService } from 'src/ai-api-handler/ai-api-handler.service';
+import { repositorySHA } from 'src/database/schemas/repositorySHA.schema';
 import { GitInteractionService } from 'src/git-interaction/git-interaction.service';
 import { MailerService } from 'src/mailer/mailer.service';
 import { SubscriptionService } from 'src/subscription/subscription.service';
@@ -21,5 +22,12 @@ export class GenerateCodeSummaryService {
     const summary: string = await this.aiService.getSummaryFromAiModel(prompt);
     this.mailService.sendMail(summary);
     return 'successful';
+  }
+
+  async subscriptionCycle(): Promise<repositorySHA[]> {
+    const repos: string[] = await this.subService.getUniqueRepositories();
+    const updatedRepos: repositorySHA[] =
+      await this.gitService.checkIfNewCommitExists(repos);
+    return updatedRepos;
   }
 }

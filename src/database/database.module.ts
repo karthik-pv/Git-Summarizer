@@ -3,6 +3,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { subscriptionSchema } from './schemas/subscription.schema';
 import { subscriptionDatabaseService } from './services/subscription.service';
+import { repositorySHADatabaseService } from './services/repositorySHA.service';
 import { repositorySHASchema } from './schemas/repositorySHA.schema';
 
 @Module({
@@ -19,7 +20,7 @@ import { repositorySHASchema } from './schemas/repositorySHA.schema';
       { name: 'RepositorySHA', schema: repositorySHASchema },
     ]),
   ],
-  providers: [subscriptionDatabaseService],
-  exports: [subscriptionDatabaseService],
+  providers: [subscriptionDatabaseService, repositorySHADatabaseService],
+  exports: [subscriptionDatabaseService, repositorySHADatabaseService],
 })
 export class DatabaseModule {}

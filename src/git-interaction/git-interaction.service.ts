@@ -1,8 +1,15 @@
 import { Injectable, HttpException } from '@nestjs/common';
 import axios from 'axios';
+import { repositorySHA } from 'src/database/schemas/repositorySHA.schema';
+import { repositorySHADatabaseService } from 'src/database/services/repositorySHA.service';
+import {
+  subscription,
+  subscriptionSchema,
+} from 'src/database/schemas/subscription.schema';
 
 @Injectable()
 export class GitInteractionService {
+  constructor(private repoSHADatabaseService: repositorySHADatabaseService) {}
   private formatRetrievedCodeToString(patchData: any): string {
     const formattedPatches = patchData.map((patch) => {
       const filename = patch.filename;
@@ -100,5 +107,29 @@ export class GitInteractionService {
       console.error('Error fetching the commit details:', error);
       throw new HttpException('Failed to fetch the commit details', 500);
     }
+  }
+  async checkIfNewCommitExists(
+    repositories: string[],
+  ): Promise<repositorySHA[]> {
+    const updatedRepoSHAs: repositorySHA[] = [];
+    const existingSHAValues: repositorySHA[] =
+      await this.repoSHADatabaseService.getAllRepositorySHA();
+
+    try {
+      for (const sub of repositories) {
+        const latestSHA = await this.getLatestSHAValue(sub);
+        const existingSHA = existingSHAValues.find(
+          (repoSHA) => repoSHA.repository === sub,
+        );
+
+        if (!existingSHA || existingSHA.SHA !== latestSHA) {
+          updatedRepoSHAs.push({ repository: sub, SHA: latestSHA });
+        }
+      }
+    } catch (error) {
+      console.error('Error checking for new commits:', error);
+    }
+
+    return updatedRepoSHAs;
   }
 }
