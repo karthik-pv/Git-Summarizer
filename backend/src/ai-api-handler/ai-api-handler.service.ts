@@ -1,23 +1,45 @@
 import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+//import { ConfigService } from '@nestjs/config';
+//import { GoogleGenerativeAI } from '@google/generative-ai';
+import * as dotenv from 'dotenv';
+import Groq from 'groq-sdk';
+
+// @Injectable()
+//export class AiApiHandlerService {
+ // private readonly genAI: GoogleGenerativeAI;
+  //private readonly model: any;
+
+  //constructor(private readonly configService: ConfigService) {
+   //  this.model = this.genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+  //}
+
+  //async getSummaryFromAiModel(prompt: string): Promise<string> {
+    //const result = await this.model.generateContent(prompt);
+    //const response = result.response;
+    //const text = response.text();
+    //return text;
+  //}
+
+
+dotenv.config();
 
 @Injectable()
 export class AiApiHandlerService {
-  private readonly genAI: GoogleGenerativeAI;
-  private readonly model: any;
+  private readonly apiKey = process.env.GROQ_API_KEY;
+  private readonly groqClient = new Groq({ apiKey: this.apiKey });
 
-  constructor(private readonly configService: ConfigService) {
-    const apiKey = this.configService.get<string>('GEMINI_API_KEY');
-    this.genAI = new GoogleGenerativeAI(apiKey);
-    this.model = this.genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
-  }
-
-  async getSummaryFromAiModel(prompt: string): Promise<string> {
-    const result = await this.model.generateContent(prompt);
-    const response = result.response;
-    const text = response.text();
-    return text;
+  async getSummaryFromAiModel(prompt: string) {
+    try {
+      const result = await this.groqClient.chat.completions.create({
+        messages: [{ role: 'user', content: prompt }],
+        model: 'llama3-8b-8192', // Replace with your desired model ID
+      });
+      const response = result.choices[0]?.message?.content;
+      return response;
+    } catch (error) {
+      console.error('Error fetching AI model response:', error);
+      throw error;
+    }
   }
 
   
