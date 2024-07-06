@@ -4,7 +4,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Home from './pages/Home';
 import Subscribe from './pages/Subscribe';
 import Customize from './pages/Customize';
-import Confirmation from './pages/Confirmation';
+import Confirmation from './pages/Confirmation'; // Import Confirmation
 
 function App() {
   return (
