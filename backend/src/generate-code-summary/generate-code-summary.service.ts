@@ -20,6 +20,7 @@ export class GenerateCodeSummaryService {
   async subscriptionCore(
     repos: string[],
     SHAMap: repositorySHA[],
+    allSubs: subscription[],
   ): Promise<any> {
     for (const repo of repos) {
       console.log(repo);
@@ -27,6 +28,24 @@ export class GenerateCodeSummaryService {
       const repository: repositorySHA = SHAMap.find(
         (entry) => entry.repository === repo,
       );
+      let managerMailList: string = '';
+      let peerDeveloperMailList: string = '';
+      let learnerMailList: string = '';
+      for (const sub of allSubs) {
+        if (sub.subscriptionType == 'Peer Developer') {
+          peerDeveloperMailList += sub.email;
+          peerDeveloperMailList += ',';
+        }
+        if (sub.subscriptionType == 'Manager') {
+          managerMailList += sub.email;
+          managerMailList += ',';
+        }
+        if (sub.subscriptionType == 'Learner') {
+          learnerMailList += sub.email;
+          learnerMailList += ',';
+        }
+      }
+      console.log(peerDeveloperMailList);
       console.log(repository);
       if (repository) {
         const repoSHA: string = repository.SHA;
@@ -34,11 +53,24 @@ export class GenerateCodeSummaryService {
           repo,
           repoSHA,
         );
-        const prompt: string =
+        const peerDeveloperPrompt: string =
           this.aiService.generatePeerDeveloperPrompt(retrievedCode);
-        const summary: string =
-          await this.aiService.getSummaryFromAiModel(prompt);
-        console.log(summary);
+        const peerDeveloperSummary: string =
+          await this.aiService.getSummaryFromAiModel(peerDeveloperPrompt);
+        const managerPrompt: string =
+          this.aiService.generateManagerPrompt(retrievedCode);
+        const managerSummary: string =
+          await this.aiService.getSummaryFromAiModel(managerPrompt);
+        const learnerPrompt: string =
+          this.aiService.generateLearnerPrompt(retrievedCode);
+        const learnerSummary: string =
+          await this.aiService.getSummaryFromAiModel(learnerPrompt);
+        await this.mailService.sendMail(
+          peerDeveloperSummary,
+          peerDeveloperMailList,
+        );
+        await this.mailService.sendMail(managerSummary, managerMailList);
+        await this.mailService.sendMail(learnerSummary, learnerMailList);
       }
     }
   }
@@ -50,7 +82,7 @@ export class GenerateCodeSummaryService {
     const code: any = await this.gitService.getUpdatedCodeFromCommit(link, SHA);
     const prompt: string = this.aiService.generatePeerDeveloperPrompt(code);
     const summary: string = await this.aiService.getSummaryFromAiModel(prompt);
-    this.mailService.sendMail(summary);
+    this.mailService.sendMail(summary, 'karthik.pv77@gmail.com');
     return 'successful';
   }
 
@@ -62,7 +94,7 @@ export class GenerateCodeSummaryService {
       await this.subService.getAllSubscription();
     const updatedSHAValues: repositorySHA[] =
       await this.repoDBSHAService.getAllRepositorySHA();
-    await this.subscriptionCore(repos, updatedSHAValues);
+    await this.subscriptionCore(repos, updatedSHAValues, allSubscriptions);
     return allSubscriptions;
   }
 }

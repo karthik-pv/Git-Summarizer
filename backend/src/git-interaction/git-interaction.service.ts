@@ -13,7 +13,11 @@ export class GitInteractionService {
   private formatRetrievedCodeToString(patchData: any): string {
     const formattedPatches = patchData.map((patch) => {
       const filename = patch.filename;
-      const patchContent = patch.content.replace(/\\n/g, '\n');
+      // Ensure patch.content is a string before calling replace on it
+      const patchContent =
+        typeof patch.content === 'string'
+          ? patch.content.replace(/\\n/g, '\n')
+          : '';
       return `Filename: ${filename}\nContent:\n${patchContent}`;
     });
 
@@ -56,7 +60,6 @@ export class GitInteractionService {
       throw new HttpException('Failed to fetch the latest commit', 500);
     }
   }
-
   async getUpdatedCodeFromCommit(
     repoUrl: string,
     commitSha: string,
@@ -75,7 +78,7 @@ export class GitInteractionService {
       const files = response.data.files;
 
       const updatedFiles = await Promise.all(
-        files.map(async (file) => {
+        files.map(async (file: any) => {
           if (file.status === 'removed') {
             return {
               filename: file.filename,

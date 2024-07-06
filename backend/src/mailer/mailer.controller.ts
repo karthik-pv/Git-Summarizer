@@ -7,7 +7,7 @@ export class MailerController {
 
   @Get('sendMail')
   sendMail() {
-    this.mailService.sendMail('test');
+    this.mailService.sendMail('test', 'karthik.pv77@gmail.com');
     return { message: 'Email sent successfully.' };
   }
 }

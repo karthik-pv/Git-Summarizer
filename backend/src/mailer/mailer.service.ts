@@ -14,11 +14,11 @@ export class MailerService {
       },
     });
   }
-  async sendMail(content: string) {
+  async sendMail(content: string, receivers: string) {
     const htmlContent = marked(content);
     const mailOptions = {
       from: 'gitsummarizer@gmail.com',
-      to: 'ananyabhat.cs22@rvce.edu.in',
+      to: receivers,
       subject: 'test',
       text: content,
       html: htmlContent,
