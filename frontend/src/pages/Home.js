@@ -3,9 +3,10 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import backgroundImage from '../assets/meme.jpg'; // Background image path
 import gitLogo from '../assets/git-logo.png'; // Git logo image path
+import { useEmailContext } from '../context/EmailContext';
 
 function Home() {
-  const [email, setEmail] = useState('');
+  const { email, updateEmail } = useEmailContext();
   const navigate = useNavigate();
 
   const validateEmail = (email) => {
@@ -20,7 +21,8 @@ function Home() {
       alert('Please enter a valid email!');
     } else {
       // Proceed with the form submission or other logic
-      alert('Email is valid! Proceeding...');
+      console.log('Email:', email);
+      updateEmail(email);
       navigate('/subscribe');
     }
   };
@@ -41,7 +43,7 @@ function Home() {
           placeholder="Enter your email address"
           className="w-full p-3 mb-4 border border-gray-300 rounded text-center"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e) => updateEmail(e.target.value)} // Update the email in the context
         />
         <div className="flex justify-center space-x-4">
           <button 
