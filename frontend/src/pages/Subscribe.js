@@ -1,10 +1,12 @@
 // src/pages/Subscribe.js
-import React, { useState } from 'react';
+import React, { useState , useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom'; // Import useNavigate for redirection
 import subscribeBg from '../assets/subscribe-background.jpeg'; // Background image path
 import subscribeImage from '../assets/jacksparrow.jpg'; // Additional image path
+import { useEmailContext } from '../context/EmailContext';
 
 function Subscribe() {
+  const { email, updateEmail } = useEmailContext();
   const [role, setRole] = useState(''); // State to manage selected role
   const navigate = useNavigate(); // useNavigate hook for redirection
 
@@ -17,6 +19,10 @@ function Subscribe() {
     // For demonstration, directly navigate to confirmation page
     navigate('/confirmation');
   };
+
+  useEffect(()=>{
+    alert(email);
+  },[]);
 
   return (
     <div
