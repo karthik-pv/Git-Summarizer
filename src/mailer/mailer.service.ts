@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
+import { marked } from 'marked';
 
 @Injectable()
 export class MailerService {
@@ -14,11 +15,13 @@ export class MailerService {
     });
   }
   async sendMail(content: string) {
+    const htmlContent = marked(content);
     const mailOptions = {
       from: 'gitsummarizer@gmail.com',
-      to: 'karthik.pv77@gmail.com',
+      to: 'ananyabhat.cs22@rvce.edu.in',
       subject: 'test',
       text: content,
+      html: htmlContent,
     };
 
     return await this.transporter.sendMail(mailOptions);
