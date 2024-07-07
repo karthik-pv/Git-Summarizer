@@ -47,12 +47,14 @@ function Customize() {
           value={prompt}
           onChange={(e) => updatePrompt(e.target.value)}
         />
-        <button
-          className="w-full p-3 bg-green-500 text-white rounded mb-4"
-          onClick={onSubmit}
-        >
-          Submit Prompt
-        </button>
+        <Link to="/confirmation">
+          <button
+            className="w-full p-3 bg-green-500 text-white rounded mb-4"
+            onClick={onSubmit}
+          >
+            Submit Prompt
+          </button>
+        </Link>
         <Link
           to="/"
           className="block w-full p-3 bg-gray-500 text-white rounded mb-2"
