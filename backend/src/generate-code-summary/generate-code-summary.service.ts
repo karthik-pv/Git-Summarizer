@@ -98,13 +98,13 @@ export class GenerateCodeSummaryService implements OnModuleInit {
   }
 
   private startInterval() {
-    this.subscriptionCycle(); // Run it immediately once
+    this.subscriptionCycle();
     setInterval(
       () => {
         this.subscriptionCycle();
       },
       5 * 60 * 1000,
-    ); // 10 minutes in milliseconds
+    );
   }
   onModuleInit() {
     this.startInterval();
