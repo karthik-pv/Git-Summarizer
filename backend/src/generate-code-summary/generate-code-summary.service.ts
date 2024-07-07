@@ -54,15 +54,6 @@ export class GenerateCodeSummaryService implements OnModuleInit {
       managerMailList = managerMailList.slice(0, -1);
       learnerMailList = learnerMailList.slice(0, -1);
 
-      // Log the email lists
-      console.log('Peer Developer Email List:', peerDeveloperMailList);
-      console.log('Manager Email List:', managerMailList);
-      console.log('Learner Email List:', learnerMailList);
-      console.log(
-        'Custom Prompt Email List:',
-        customPromptMailList.map((sub) => sub.email),
-      );
-
       if (repository) {
         const repoSHA: string = repository.SHA;
         const retrievedCode = await this.gitService.getUpdatedCodeFromCommit(
