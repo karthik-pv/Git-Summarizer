@@ -29,7 +29,7 @@ export class GenerateCodeSummaryService implements OnModuleInit {
       let managerMailList: string = '';
       let peerDeveloperMailList: string = '';
       let learnerMailList: string = '';
-      const customPromptMailList: subscription[] = []; // Initialize the array
+      const customPromptMailList: subscription[] = [];
 
       for (const sub of allSubs) {
         if (
@@ -138,12 +138,11 @@ export class GenerateCodeSummaryService implements OnModuleInit {
       await this.subService.getAllSubscription();
     const updatedSHAValues: repositorySHA[] =
       await this.repoDBSHAService.getAllRepositorySHA();
-    // return await this.subscriptionCore(
-    //   repos,
-    //   updatedSHAValues,
-    //   allSubscriptions,
-    // );
-    return 'e';
+    return await this.subscriptionCore(
+      updatedReposString,
+      updatedSHAValues,
+      allSubscriptions,
+    );
   }
 
   private startInterval() {
