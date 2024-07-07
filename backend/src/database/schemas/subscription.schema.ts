@@ -10,6 +10,9 @@ export class subscription {
 
   @Prop()
   subscriptionType: string;
+
+  @Prop()
+  customPrompt: string;
 }
 
 export const subscriptionSchema = SchemaFactory.createForClass(subscription);

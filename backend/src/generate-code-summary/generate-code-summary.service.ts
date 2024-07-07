@@ -29,44 +29,87 @@ export class GenerateCodeSummaryService implements OnModuleInit {
       let managerMailList: string = '';
       let peerDeveloperMailList: string = '';
       let learnerMailList: string = '';
+      const customPromptMailList: subscription[] = []; // Initialize the array
+
       for (const sub of allSubs) {
-        if (sub.subscriptionType == 'Peer Developer') {
-          peerDeveloperMailList += sub.email;
-          peerDeveloperMailList += ',';
+        if (
+          sub.subscriptionType == 'Peer Developer' &&
+          sub.repository === repo
+        ) {
+          peerDeveloperMailList += sub.email + ',';
         }
-        if (sub.subscriptionType == 'Manager') {
-          managerMailList += sub.email;
-          managerMailList += ',';
+        if (sub.subscriptionType == 'Manager' && sub.repository === repo) {
+          managerMailList += sub.email + ',';
         }
-        if (sub.subscriptionType == 'Learner') {
-          learnerMailList += sub.email;
-          learnerMailList += ',';
+        if (sub.subscriptionType == 'Learner' && sub.repository === repo) {
+          learnerMailList += sub.email + ',';
+        }
+        if (sub.subscriptionType == 'Custom' && sub.repository === repo) {
+          customPromptMailList.push(sub);
         }
       }
+
+      // Remove trailing commas
+      peerDeveloperMailList = peerDeveloperMailList.slice(0, -1);
+      managerMailList = managerMailList.slice(0, -1);
+      learnerMailList = learnerMailList.slice(0, -1);
+
+      // Log the email lists
+      console.log('Peer Developer Email List:', peerDeveloperMailList);
+      console.log('Manager Email List:', managerMailList);
+      console.log('Learner Email List:', learnerMailList);
+      console.log(
+        'Custom Prompt Email List:',
+        customPromptMailList.map((sub) => sub.email),
+      );
+
       if (repository) {
         const repoSHA: string = repository.SHA;
         const retrievedCode = await this.gitService.getUpdatedCodeFromCommit(
           repo,
           repoSHA,
         );
+
         const peerDeveloperPrompt: string =
           this.aiService.generatePeerDeveloperPrompt(retrievedCode);
         const peerDeveloperSummary: string =
           await this.aiService.getSummaryFromAiModel(peerDeveloperPrompt);
+
         const managerPrompt: string =
           this.aiService.generateManagerPrompt(retrievedCode);
         const managerSummary: string =
           await this.aiService.getSummaryFromAiModel(managerPrompt);
+
         const learnerPrompt: string =
           this.aiService.generateLearnerPrompt(retrievedCode);
         const learnerSummary: string =
           await this.aiService.getSummaryFromAiModel(learnerPrompt);
-        await this.mailService.sendMail(
-          peerDeveloperSummary,
-          peerDeveloperMailList,
-        );
-        await this.mailService.sendMail(managerSummary, managerMailList);
-        await this.mailService.sendMail(learnerSummary, learnerMailList);
+
+        // Check if there are recipients before sending emails
+        if (peerDeveloperMailList) {
+          await this.mailService.sendMail(
+            peerDeveloperSummary,
+            peerDeveloperMailList,
+          );
+        }
+
+        if (managerMailList) {
+          await this.mailService.sendMail(managerSummary, managerMailList);
+        }
+
+        if (learnerMailList) {
+          await this.mailService.sendMail(learnerSummary, learnerMailList);
+        }
+
+        for (const sub of customPromptMailList) {
+          const prompt = this.aiService.generateCustomPrompt(
+            sub.customPrompt,
+            retrievedCode,
+          );
+          const customPromptSummary: string =
+            await this.aiService.getSummaryFromAiModel(prompt);
+          await this.mailService.sendMail(customPromptSummary, sub.email);
+        }
       }
     }
   }
@@ -82,19 +125,25 @@ export class GenerateCodeSummaryService implements OnModuleInit {
     return 'successful';
   }
 
-  async subscriptionCycle(): Promise<subscription[]> {
+  async subscriptionCycle(): Promise<string> {
     const repos: string[] = await this.subService.getUniqueRepositories();
     const updatedRepos: repositorySHA[] =
       await this.gitService.checkIfNewCommitExists(repos);
+    const updatedReposString: string[] = [];
+    for (const rep of updatedRepos) {
+      updatedReposString.push(rep.repository);
+    }
+    console.log(updatedReposString);
     const allSubscriptions: subscription[] =
       await this.subService.getAllSubscription();
     const updatedSHAValues: repositorySHA[] =
       await this.repoDBSHAService.getAllRepositorySHA();
-    return await this.subscriptionCore(
-      repos,
-      updatedSHAValues,
-      allSubscriptions,
-    );
+    // return await this.subscriptionCore(
+    //   repos,
+    //   updatedSHAValues,
+    //   allSubscriptions,
+    // );
+    return 'e';
   }
 
   private startInterval() {

@@ -6,20 +6,19 @@ import Groq from 'groq-sdk';
 
 // @Injectable()
 //export class AiApiHandlerService {
- // private readonly genAI: GoogleGenerativeAI;
-  //private readonly model: any;
+// private readonly genAI: GoogleGenerativeAI;
+//private readonly model: any;
 
-  //constructor(private readonly configService: ConfigService) {
-   //  this.model = this.genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
-  //}
+//constructor(private readonly configService: ConfigService) {
+//  this.model = this.genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+//}
 
-  //async getSummaryFromAiModel(prompt: string): Promise<string> {
-    //const result = await this.model.generateContent(prompt);
-    //const response = result.response;
-    //const text = response.text();
-    //return text;
-  //}
-
+//async getSummaryFromAiModel(prompt: string): Promise<string> {
+//const result = await this.model.generateContent(prompt);
+//const response = result.response;
+//const text = response.text();
+//return text;
+//}
 
 dotenv.config();
 
@@ -42,7 +41,6 @@ export class AiApiHandlerService {
     }
   }
 
-  
   generateManagerPrompt(code: string): string {
     const prompt = `
       As a project manager, you need concise updates on GitHub repository changes. 
@@ -89,4 +87,7 @@ export class AiApiHandlerService {
     return prompt + '\n\n' + code;
   }
 
+  generateCustomPrompt(prompt: string, code: string) {
+    return prompt + '\n\n' + code;
+  }
 }
