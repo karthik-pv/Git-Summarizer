@@ -136,24 +136,13 @@ export class GenerateCodeSummaryService implements OnModuleInit {
     );
   }
 
-  async trialRun(): Promise<string> {
-    const repos: string[] = await this.subService.getUniqueRepositories();
-    const link = 'https://github.com/karthik-pv/Emuser';
-    const SHA: string = await this.gitService.getLatestSHAValue(link);
-    const code: any = await this.gitService.getUpdatedCodeFromCommit(link, SHA);
-    const prompt: string = this.aiService.generatePeerDeveloperPrompt(code);
-    const summary: string = await this.aiService.getSummaryFromAiModel(prompt);
-    this.mailService.sendMail(summary, 'karthik.pv77@gmail.com');
-    return 'successful';
-  }
-
   private startInterval() {
     this.subscriptionCycle();
     setInterval(
       () => {
         this.subscriptionCycle();
       },
-      5 * 60 * 1000,
+      2 * 60 * 1000,
     );
   }
   onModuleInit() {
