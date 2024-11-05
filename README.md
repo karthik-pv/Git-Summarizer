@@ -57,6 +57,7 @@ $ npm run test:e2e
 # test coverage
 $ npm run test:cov
 ```
+testing the project, updating readme, groq api is amazing
 
 ## Support
 an interesting project leveraging groq api and nodemailer
